@@ -10,7 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
-import { Alert, FlatList, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Platform, StatusBar, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Todo = Doc<"todos">;
@@ -41,12 +41,26 @@ export default function Index() {
     }
   };
 
+
   const handleDeleteTodo = async (id: Id<"todos">) => {
-    Alert.alert("Delete Todo", "Are you sure you want to delete this todo?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteTodo({ id }) },
-    ]);
+    debugger;
+    console.log(Platform);
+    if (Platform.OS === "web") 
+    {
+      const confirmed = window.confirm("Are you sure you want to delete this todo?");
+      if (confirmed) {
+        await deleteTodo({ id });
+      }
+    } 
+    else
+    {
+      Alert.alert("Delete Todo", "Are you sure you want to delete this todo?", [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deleteTodo({ id }) },
+      ]);
+    }
   };
+
 
   const handleEditTodo = (todo: Todo) => {
     setEditText(todo.text);
@@ -74,7 +88,10 @@ export default function Index() {
   const renderTodoItem = ({ item }: { item: Todo }) => {
     const isEditing = editingId === item._id;
     return (
-      <View style={homeStyles.todoItemWrapper}>
+      <View 
+        style={homeStyles.todoItemWrapper}
+        
+      >
         <LinearGradient
           colors={colors.gradients.surface}
           style={homeStyles.todoItem}
